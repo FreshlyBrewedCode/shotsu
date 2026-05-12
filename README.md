@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# shotsu
 
-## Getting Started
+shotsu is an open, and minimal photography portfolio platform where users own their photos and profile and are not locked in by the platform. 
 
-First, run the development server:
+# User experience
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- shotsu is based around profiles. Visiting a profile will show the profile page from where you can navigate to the profiles sets. 
+- users can create "sets" of photos. During creation or editing of a set, users can add photos, change the layout and order of photos as well as other parameters about the apperance of the set. Each set displays on a single page where you scroll from top to bottom.
+  - a set consists of one or more sections. a section is a logical grouping of photos. it is possible to edit parameters per section (e.g. layout)
+  - each set has a title
+- editing:
+  - sets can be created via the "plus" button in the nav bar
+  - toolbar: when in edit mode, a toolbar is displayed (left side on desktop, bottom on mobile) with icon buttons for general edit options (e.g. add button)
+  - edit element: a right click (long press on mobile) brings up an edit context menu (bottom drawer/sheet on mobile) with editing optios for the selected element
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Technical background
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- simple and open profile format. shotsu profiles are a JSON index file, with additonal JSON files for each set
+- photos are referenced using relative urls
+- a full shotsu profile is just JSON files + photos and can be easily exported or published for hosting/serving by different publishing providers (this is how shotsu stays open and decentralized). Its just static files.
+- the main shotsu client app is a web app. The app can be used for viewing and editing profiles.
+  - viewing: the app just fetches the JSON and renders the profile accoringly. It might transform the photo ulrs based on the used publishing provider
+  - editing: the editing workflow is local first. The app maintains a local copy of the profile and photo catalog. Since the data format is extremly simple and lightweight the required files for a full shotsu profile can be easily generated on the fly. Users can configure different publishing providers in the app and publish their edits. A publishing abstraction is used so different providers only need to implement the publishing interface.
