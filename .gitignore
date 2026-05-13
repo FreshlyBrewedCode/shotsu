@@ -43,6 +43,5 @@ next-env.d.ts
 
 public/photos/**
 
-# playwright-cli
-.claude/
+# playwright-cli runtime output
 .playwright-cli/
