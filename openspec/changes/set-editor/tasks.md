@@ -2,20 +2,20 @@
 
 Types, storage adapter, and profile state initialization.
 
-- [ ] 1.1 Create `lib/types.ts` defining `Profile`, `SetSummary`, `Set`, `Section`, `PhotoRef` (`{ id: string }`), `CatalogEntry`, and `ExifData` TypeScript interfaces
-- [ ] 1.2 Add helper to generate a new default `Section` (UUID id, layout `"default"`, empty photos array)
-- [ ] 1.3 Add helper to generate a new default `Set` (UUID id, empty title, one default section)
-- [ ] 2.1 Create `lib/storage/adapter.ts` defining the `StorageAdapter` interface (`initialize`, `getDoc`, `setDoc`, `deleteDoc`, `putBlob`, `getBlobURL`, `deleteBlob`)
-- [ ] 2.2 Install the `idb` library (`npm install idb`)
-- [ ] 2.3 Create `lib/storage/indexeddb-adapter.ts` implementing `StorageAdapter` using IndexedDB with two object stores: `documents` (string keys → JSON) and `blobs` (string keys → Blob)
-- [ ] 2.4 In `IndexedDBAdapter.initialize()`, call `navigator.storage.persist()` and log a warning if denied
-- [ ] 2.5 Verify `getDoc` returns `null` for missing keys without throwing
-- [ ] 2.6 Verify `getBlobURL` returns a `URL.createObjectURL(...)` string for stored blobs
-- [ ] 4.1 Create `lib/profile-store.tsx` with `ProfileContext`, `ProfileProvider`, and `useProfile` hook
-- [ ] 4.2 `ProfileProvider` accepts a `StorageAdapter` prop and calls `adapter.initialize()` on mount before loading state
-- [ ] 4.3 On mount, load profile from `adapter.getDoc("profile")` and catalog index from `adapter.getDoc("catalog-index")` — initialize defaults if null
-- [ ] 4.6 Wrap the root layout (`app/layout.tsx`) with `ProfileProvider`, passing an `IndexedDBAdapter` instance
-- [ ] 9.1 Verify the storage layer: the app boots without console errors, IndexedDB stores are created, and adapter document/blob round-trips persist across a page reload
+- [x] 1.1 Create `lib/types.ts` defining `Profile`, `SetSummary`, `Set`, `Section`, `PhotoRef` (`{ id: string }`), `CatalogEntry`, and `ExifData` TypeScript interfaces
+- [x] 1.2 Add helper to generate a new default `Section` (UUID id, layout `"default"`, empty photos array)
+- [x] 1.3 Add helper to generate a new default `Set` (UUID id, empty title, one default section)
+- [x] 2.1 Create `lib/storage/adapter.ts` defining the `StorageAdapter` interface (`initialize`, `getDoc`, `setDoc`, `deleteDoc`, `putBlob`, `getBlobURL`, `deleteBlob`)
+- [x] 2.2 Install the `idb` library (`npm install idb`)
+- [x] 2.3 Create `lib/storage/indexeddb-adapter.ts` implementing `StorageAdapter` using IndexedDB with two object stores: `documents` (string keys → JSON) and `blobs` (string keys → Blob)
+- [x] 2.4 In `IndexedDBAdapter.initialize()`, call `navigator.storage.persist()` and log a warning if denied
+- [x] 2.5 Verify `getDoc` returns `null` for missing keys without throwing
+- [x] 2.6 Verify `getBlobURL` returns a `URL.createObjectURL(...)` string for stored blobs
+- [x] 4.1 Create `lib/profile-store.tsx` with `ProfileContext`, `ProfileProvider`, and `useProfile` hook
+- [x] 4.2 `ProfileProvider` accepts a `StorageAdapter` prop and calls `adapter.initialize()` on mount before loading state
+- [x] 4.3 On mount, load profile from `adapter.getDoc("profile")` and catalog index from `adapter.getDoc("catalog-index")` — initialize defaults if null
+- [x] 4.6 Wrap the root layout (`app/layout.tsx`) with `ProfileProvider`, passing an `IndexedDBAdapter` instance
+- [x] 9.1 Verify the storage layer: the app boots without console errors, IndexedDB stores are created, and adapter document/blob round-trips persist across a page reload
 
 ## Batch 2: Nav & Empty Set
 

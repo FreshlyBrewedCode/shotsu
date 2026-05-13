@@ -45,3 +45,7 @@ public/photos/**
 
 # playwright-cli runtime output
 .playwright-cli/
+
+# test outputs
+/test-results/
+/playwright-report/
