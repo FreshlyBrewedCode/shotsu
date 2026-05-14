@@ -3,6 +3,7 @@
 import { ProfileProvider } from "@/lib/profile-store";
 import { IndexedDBAdapter } from "@/lib/storage/indexeddb-adapter";
 import { useMemo, useEffect } from "react";
+import { Nav } from "@/components/nav";
 
 declare global {
   interface Window {
@@ -19,5 +20,10 @@ export function ProfileProviderWrapper({ children }: { children: React.ReactNode
     }
   }, [adapter]);
 
-  return <ProfileProvider adapter={adapter}>{children}</ProfileProvider>;
+  return (
+    <ProfileProvider adapter={adapter}>
+      <Nav />
+      <main className="pt-14">{children}</main>
+    </ProfileProvider>
+  );
 }

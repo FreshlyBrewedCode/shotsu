@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { profileReducer, getDefaultState } from "./profile-store";
-import { Profile, Set, Section, CatalogEntry } from "../types";
+import { Profile, Set, Section, CatalogEntry } from "./types";
 
 function makeProfile(overrides?: Partial<Profile>): Profile {
   return { id: "p-1", name: "", sets: [], ...overrides };

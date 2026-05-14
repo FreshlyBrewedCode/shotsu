@@ -5,11 +5,10 @@ import {
   useContext,
   useEffect,
   useReducer,
-  useState,
   ReactNode,
 } from "react";
 import { StorageAdapter } from "./storage/adapter";
-import { Profile, Set, CatalogEntry, createProfile, createSet } from "./types";
+import { Profile, Set, CatalogEntry, createProfile } from "./types";
 
 type ProfileState = {
   profile: Profile;
@@ -190,7 +189,6 @@ export function ProfileProvider({
   adapter: StorageAdapter;
 }) {
   const [state, dispatch] = useReducer(profileReducer, null, getDefaultState);
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -214,7 +212,6 @@ export function ProfileProvider({
 
       if (!cancelled) {
         dispatch({ type: "INIT", profile, sets, catalog });
-        setReady(true);
       }
     }
 

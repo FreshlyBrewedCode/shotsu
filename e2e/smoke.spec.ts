@@ -18,7 +18,7 @@ test.describe("Smoke: app boots cleanly", () => {
 
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    await page.waitForFunction(() => (window as any).__testAdapter !== undefined, {
+    await page.waitForFunction(() => window.__testAdapter !== undefined, {
       timeout: 10000,
     });
 
@@ -27,38 +27,38 @@ test.describe("Smoke: app boots cleanly", () => {
 
   test("adapter document and blob round-trips persist across reload", async ({ page }) => {
     await page.goto("/");
-    await page.waitForFunction(() => (window as any).__testAdapter !== undefined, {
+    await page.waitForFunction(() => window.__testAdapter !== undefined, {
       timeout: 10000,
     });
 
     // Document round-trip
     await page.evaluate(async () => {
-      await (window as any).__testAdapter.setDoc("smoke/doc", { hello: "world" });
+      await window.__testAdapter!.setDoc("smoke/doc", { hello: "world" });
     });
 
     await page.reload();
-    await page.waitForFunction(() => (window as any).__testAdapter !== undefined, {
+    await page.waitForFunction(() => window.__testAdapter !== undefined, {
       timeout: 10000,
     });
 
     const doc = await page.evaluate(async () => {
-      return await (window as any).__testAdapter.getDoc("smoke/doc");
+      return await window.__testAdapter!.getDoc("smoke/doc");
     });
     expect(doc).toEqual({ hello: "world" });
 
     // Blob round-trip
     await page.evaluate(async () => {
       const blob = new Blob(["blob content"], { type: "text/plain" });
-      await (window as any).__testAdapter.putBlob("smoke/blob", blob);
+      await window.__testAdapter!.putBlob("smoke/blob", blob);
     });
 
     await page.reload();
-    await page.waitForFunction(() => (window as any).__testAdapter !== undefined, {
+    await page.waitForFunction(() => window.__testAdapter !== undefined, {
       timeout: 10000,
     });
 
     const blobText = await page.evaluate(async () => {
-      const url = await (window as any).__testAdapter.getBlobURL("smoke/blob");
+      const url = await window.__testAdapter!.getBlobURL("smoke/blob");
       const text = await fetch(url).then((r: Response) => r.text());
       URL.revokeObjectURL(url);
       return text;
@@ -67,8 +67,8 @@ test.describe("Smoke: app boots cleanly", () => {
 
     // Cleanup
     await page.evaluate(async () => {
-      await (window as any).__testAdapter.deleteDoc("smoke/doc");
-      await (window as any).__testAdapter.deleteBlob("smoke/blob");
+      await window.__testAdapter!.deleteDoc("smoke/doc");
+      await window.__testAdapter!.deleteBlob("smoke/blob");
     });
   });
 });

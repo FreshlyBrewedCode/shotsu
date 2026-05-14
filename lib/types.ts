@@ -46,9 +46,21 @@ export type CatalogEntry = {
   addedAt: string;
 };
 
+export function generateId(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for non-secure contexts (e.g. mobile over HTTP)
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 export function createSection(): Section {
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     layout: "default",
     photos: [],
   };
@@ -56,7 +68,7 @@ export function createSection(): Section {
 
 export function createSet(): Set {
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     title: "",
     sections: [createSection()],
   };
@@ -64,7 +76,7 @@ export function createSet(): Set {
 
 export function createProfile(): Profile {
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     name: "",
     sets: [],
   };
