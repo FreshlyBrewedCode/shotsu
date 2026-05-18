@@ -26,7 +26,11 @@ type ProfileAction =
   | { type: "MOVE_SECTION"; setId: string; sectionId: string; direction: "up" | "down" }
   | { type: "UPDATE_SECTION_LAYOUT"; setId: string; sectionId: string; layout: "default" | "columns" }
   | { type: "ADD_PHOTO"; setId: string; sectionId: string; photoId: string }
-  | { type: "REMOVE_PHOTO"; setId: string; sectionId: string; photoId: string };
+  | { type: "REMOVE_PHOTO"; setId: string; sectionId: string; photoId: string }
+  | { type: "UPDATE_PROFILE_NAME"; name: string }
+  | { type: "UPDATE_PROFILE_BIO"; bio: string }
+  | { type: "UPDATE_PROFILE_AVATAR"; photoId: string | null }
+  | { type: "SET_COVER"; setId: string; photoId: string | null };
 
 export function profileReducer(state: ProfileState, action: ProfileAction): ProfileState {
   switch (action.type) {
@@ -154,6 +158,34 @@ export function profileReducer(state: ProfileState, action: ProfileAction): Prof
             : s
         ),
       };
+      return {
+        ...state,
+        sets: { ...state.sets, [setId]: updatedSet },
+      };
+    }
+    case "UPDATE_PROFILE_NAME": {
+      return {
+        ...state,
+        profile: { ...state.profile, name: action.name },
+      };
+    }
+    case "UPDATE_PROFILE_BIO": {
+      return {
+        ...state,
+        profile: { ...state.profile, bio: action.bio },
+      };
+    }
+    case "UPDATE_PROFILE_AVATAR": {
+      return {
+        ...state,
+        profile: { ...state.profile, avatarPhotoId: action.photoId },
+      };
+    }
+    case "SET_COVER": {
+      const { setId, photoId } = action;
+      const existing = state.sets[setId];
+      if (!existing) return state;
+      const updatedSet: Set = { ...existing, coverPhotoId: photoId };
       return {
         ...state,
         sets: { ...state.sets, [setId]: updatedSet },

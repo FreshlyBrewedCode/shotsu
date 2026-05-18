@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/lib/profile-store";
 import { createSet } from "@/lib/types";
-import { Plus } from "@phosphor-icons/react";
+import { Plus, User } from "@phosphor-icons/react";
 
 export function Nav() {
   const { dispatch } = useProfile();
@@ -25,13 +25,22 @@ export function Nav() {
       >
         shotsu
       </Link>
-      <button
-        onClick={handleCreateSet}
-        aria-label="Create new set"
-        className="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
-      >
-        <Plus size={20} weight="bold" />
-      </button>
+      <div className="flex items-center gap-1">
+        <Link
+          href="/profile"
+          aria-label="Profile"
+          className="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
+        >
+          <User size={20} weight="bold" />
+        </Link>
+        <button
+          onClick={handleCreateSet}
+          aria-label="Create new set"
+          className="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
+        >
+          <Plus size={20} weight="bold" />
+        </button>
+      </div>
     </nav>
   );
 }

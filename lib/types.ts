@@ -11,6 +11,7 @@ export type Section = {
 export type Set = {
   id: string;
   title: string;
+  coverPhotoId: string | null;
   sections: Section[];
 };
 
@@ -22,6 +23,8 @@ export type SetSummary = {
 export type Profile = {
   id: string;
   name: string;
+  bio: string;
+  avatarPhotoId: string | null;
   sets: SetSummary[];
 };
 
@@ -70,6 +73,7 @@ export function createSet(): Set {
   return {
     id: generateId(),
     title: "",
+    coverPhotoId: null,
     sections: [createSection()],
   };
 }
@@ -78,6 +82,8 @@ export function createProfile(): Profile {
   return {
     id: generateId(),
     name: "",
+    bio: "",
+    avatarPhotoId: null,
     sets: [],
   };
 }
