@@ -15,15 +15,22 @@ The system SHALL define a Set as a JSON-serializable object containing an `id` (
 - **THEN** it SHALL have a unique UUID id, a non-null title (may be empty string), `coverPhotoId` set to `null`, and at least one Section with layout `"default"` and an empty photos array
 
 ### Requirement: PhotoRef stores id only
-The system SHALL NOT store photo src URLs in the data model. A PhotoRef SHALL contain only `id`. The renderable URL for a photo SHALL be obtained at runtime from the storage adapter via `getBlobURL("photo:{id}")`, which returns a session-scoped object URL.
+The system SHALL NOT store photo src URLs in the data model. A PhotoRef SHALL contain only `id`. The renderable URL for a photo SHALL be obtained at runtime from the `PhotoResolver` context via `resolve("{id}")`.
 
 #### Scenario: Rendering a photo from a PhotoRef
-- **WHEN** the editor needs to render a photo with a given PhotoRef
-- **THEN** it SHALL call `adapter.getBlobURL("photo:{id}")` to obtain a URL suitable for use in an `<img src>` attribute
+- **WHEN** a component needs to render a photo with a given PhotoRef
+- **THEN** it SHALL call `resolve("{id}")` from the `PhotoResolver` context to obtain a URL suitable for use in an `<img src>` attribute
 
 #### Scenario: Object URLs are revoked on cleanup
 - **WHEN** a component that requested a blob URL is unmounted
 - **THEN** the object URL SHALL be revoked via `URL.revokeObjectURL()` to prevent memory leaks
+
+### Requirement: PhotoBlob uses PhotoResolver
+The `PhotoBlob` component SHALL consume the `PhotoResolver` context to obtain photo URLs. It SHALL NOT directly access `useProfile().adapter`.
+
+#### Scenario: PhotoBlob renders with resolver
+- **WHEN** `PhotoBlob` renders with `photoId="abc-123"`
+- **THEN** it SHALL call `resolve("abc-123")` from the `PhotoResolver` context and use the returned URL as the image source
 
 ### Requirement: Storage adapter interface
 The system SHALL define a `StorageAdapter` interface with the following methods:
@@ -66,11 +73,11 @@ The system SHALL provide a concrete `IndexedDBAdapter` implementing `StorageAdap
 - **THEN** it SHALL call `navigator.storage.persist()` to request durable storage and log a warning if the request is denied
 
 ### Requirement: Profile state context
-The system SHALL expose profile state and the storage adapter via a React context (`ProfileProvider`) that provides the current profile, all loaded sets, the adapter instance, and dispatch functions for state mutations. All components within the context tree SHALL be able to read and modify profile state.
+The system SHALL expose profile state, the storage adapter, and the photo resolver via a React context (`ProfileProvider`). All components within the context tree SHALL be able to read profile state, call dispatch actions for mutations, and resolve photo URLs.
 
-#### Scenario: Context provides state to children
+#### Scenario: Context provides state and resolver to children
 - **WHEN** a component renders inside the ProfileProvider
-- **THEN** it SHALL be able to read the current profile and sets and call dispatch actions via the provided `useProfile` hook
+- **THEN** it SHALL be able to read the current profile and sets, call dispatch actions, and resolve photo URLs via `usePhotoResolver()`
 
 #### Scenario: UPDATE_PROFILE_NAME action updates name
 - **WHEN** the `UPDATE_PROFILE_NAME` action is dispatched with a new name string
