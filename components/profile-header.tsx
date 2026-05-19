@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
-import { useProfile } from "@/lib/profile-store";
+import { useState, useCallback, useRef, useEffect, useContext } from "react";
+import { ProfileContext } from "@/lib/profile-store";
 import { PhotoBlob } from "@/components/photo-blob";
 import { User, X } from "@phosphor-icons/react";
 
 export function ProfileHeader() {
-  const { state, dispatch } = useProfile();
-  const { profile } = state;
+  const ctx = useContext(ProfileContext);
+  const state = ctx?.state;
+  const dispatch = ctx?.dispatch;
+  const profile = state?.profile;
+  const canEdit = dispatch !== undefined;
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -31,21 +34,25 @@ export function ProfileHeader() {
   }, [isEditingBio]);
 
   const startEditingName = useCallback(() => {
+    if (!profile) return;
     setNameValue(profile.name);
     setIsEditingName(true);
-  }, [profile.name]);
+  }, [profile]);
 
   const startEditingBio = useCallback(() => {
+    if (!profile) return;
     setBioValue(profile.bio);
     setIsEditingBio(true);
-  }, [profile.bio]);
+  }, [profile]);
 
   const saveName = useCallback(() => {
+    if (!dispatch) return;
     dispatch({ type: "UPDATE_PROFILE_NAME", name: nameValue });
     setIsEditingName(false);
   }, [dispatch, nameValue]);
 
   const saveBio = useCallback(() => {
+    if (!dispatch) return;
     dispatch({ type: "UPDATE_PROFILE_BIO", bio: bioValue });
     setIsEditingBio(false);
   }, [dispatch, bioValue]);
@@ -75,6 +82,7 @@ export function ProfileHeader() {
 
   const handleAvatarSelect = useCallback(
     (photoId: string) => {
+      if (!dispatch) return;
       dispatch({ type: "UPDATE_PROFILE_AVATAR", photoId });
       setShowAvatarPicker(false);
     },
@@ -82,32 +90,50 @@ export function ProfileHeader() {
   );
 
   const handleRemoveAvatar = useCallback(() => {
+    if (!dispatch) return;
     dispatch({ type: "UPDATE_PROFILE_AVATAR", photoId: null });
     setShowAvatarPicker(false);
   }, [dispatch]);
+
+  if (!profile) {
+    return null;
+  }
 
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:gap-8">
         {/* Avatar */}
-        <button
-          onClick={() => setShowAvatarPicker(true)}
-          className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-primary transition-all"
-          aria-label="Change avatar"
-        >
-          {profile.avatarPhotoId ? (
-            <PhotoBlob
-              photoId={profile.avatarPhotoId}
-              className="w-full h-full"
-            />
-          ) : (
-            <User size={48} weight="duotone" className="text-muted-foreground" />
-          )}
-        </button>
+        {canEdit ? (
+          <button
+            onClick={() => setShowAvatarPicker(true)}
+            className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-primary transition-all"
+            aria-label="Change avatar"
+          >
+            {profile.avatarPhotoId ? (
+              <PhotoBlob
+                photoId={profile.avatarPhotoId}
+                className="w-full h-full"
+              />
+            ) : (
+              <User size={48} weight="duotone" className="text-muted-foreground" />
+            )}
+          </button>
+        ) : (
+          <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+            {profile.avatarPhotoId ? (
+              <PhotoBlob
+                photoId={profile.avatarPhotoId}
+                className="w-full h-full"
+              />
+            ) : (
+              <User size={48} weight="duotone" className="text-muted-foreground" />
+            )}
+          </div>
+        )}
 
         {/* Name + Bio */}
         <div className="flex flex-col items-center md:items-start gap-2 flex-1 min-w-0 text-center md:text-left">
-          {isEditingName ? (
+          {canEdit && isEditingName ? (
             <input
               ref={nameInputRef}
               type="text"
@@ -120,14 +146,14 @@ export function ProfileHeader() {
             />
           ) : (
             <h1
-              onClick={startEditingName}
-              className="text-2xl font-heading cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={canEdit ? startEditingName : undefined}
+              className={`text-2xl font-heading ${canEdit ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`}
             >
               {profile.name || "Untitled Profile"}
             </h1>
           )}
 
-          {isEditingBio ? (
+          {canEdit && isEditingBio ? (
             <textarea
               ref={bioInputRef}
               value={bioValue}
@@ -140,8 +166,8 @@ export function ProfileHeader() {
             />
           ) : (
             <p
-              onClick={startEditingBio}
-              className={`text-sm cursor-pointer hover:opacity-80 transition-opacity ${
+              onClick={canEdit ? startEditingBio : undefined}
+              className={`text-sm ${canEdit ? "cursor-pointer hover:opacity-80 transition-opacity" : ""} ${
                 profile.bio ? "text-foreground" : "text-muted-foreground"
               }`}
             >
@@ -152,7 +178,7 @@ export function ProfileHeader() {
       </div>
 
       {/* Avatar Picker Modal */}
-      {showAvatarPicker && (
+      {canEdit && showAvatarPicker && (
         <div
           className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => setShowAvatarPicker(false)}

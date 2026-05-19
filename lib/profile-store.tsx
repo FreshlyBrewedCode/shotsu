@@ -4,11 +4,13 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   ReactNode,
 } from "react";
 import { StorageAdapter } from "./storage/adapter";
 import { Profile, Set, CatalogEntry, createProfile } from "./types";
+import { PhotoResolver, LocalResolver } from "./photo-resolver";
 
 type ProfileState = {
   profile: Profile;
@@ -211,7 +213,7 @@ type ProfileContextValue = {
   adapter: StorageAdapter;
 };
 
-const ProfileContext = createContext<ProfileContextValue | null>(null);
+export const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 export function ProfileProvider({
   children,
@@ -221,6 +223,7 @@ export function ProfileProvider({
   adapter: StorageAdapter;
 }) {
   const [state, dispatch] = useReducer(profileReducer, null, getDefaultState);
+  const resolver = useMemo(() => new LocalResolver(adapter), [adapter]);
 
   useEffect(() => {
     let cancelled = false;
@@ -270,7 +273,9 @@ export function ProfileProvider({
 
   return (
     <ProfileContext.Provider value={{ state, dispatch, adapter }}>
-      {children}
+      <PhotoResolver.Provider value={resolver}>
+        {children}
+      </PhotoResolver.Provider>
     </ProfileContext.Provider>
   );
 }

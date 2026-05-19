@@ -3,8 +3,7 @@
 import { useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useProfile } from "@/lib/profile-store";
-import { Section as SectionComponent } from "@/components/section";
-import { PhotoBlob } from "@/components/photo-blob";
+import { SetViewer } from "@/components/set-viewer";
 import { EditToolbar } from "@/components/edit-toolbar";
 import { EditProvider, useEdit } from "@/lib/edit-context";
 import { ingestPhoto } from "@/lib/ingest";
@@ -28,6 +27,10 @@ function SetEditPageInner() {
       router.replace("/");
     }
   }, [state.initialized, set, router]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,70 +70,42 @@ function SetEditPageInner() {
   }
 
   return (
-    <div className="w-screen min-h-screen max-w-screen flex flex-col md:pl-16 pb-16 md:pb-0">
-      <div className="px-4 py-6">
-        <input
-          type="text"
-          value={set.title}
-          onChange={handleTitleChange}
-          placeholder="Untitled Set"
-          className="w-full text-3xl font-heading bg-transparent border-b border-border focus:outline-none focus:border-primary pb-2"
-          aria-label="Set title"
-        />
-      </div>
-      <div className="flex flex-col">
-        {set.sections.map((section, index) => (
-          <div key={section.id} className="flex flex-col">
-            {index > 0 && (
-              <div className="w-full h-px bg-border my-2" aria-hidden="true" />
-            )}
-            <div
-              className="border border-transparent hover:border-dashed hover:border-muted-foreground/30 rounded-sm transition-colors p-1 -m-1"
-              onContextMenu={(e) =>
-                ctxMenu.handleContextMenu(e, { type: "section", sectionId: section.id })
-              }
-              onTouchStart={(e) =>
-                ctxMenu.handleTouchStart(e, { type: "section", sectionId: section.id })
-              }
-              onTouchMove={ctxMenu.handleTouchMove}
-              onTouchEnd={ctxMenu.handleTouchEnd}
-            >
-              <SectionComponent layout={section.layout}>
-                {section.photos.length === 0 && (
-                  <div className="text-muted-foreground text-sm py-8 text-center">
-                    Empty section
-                  </div>
-                )}
-                {section.photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      ctxMenu.open(
-                        { type: "photo", sectionId: section.id, photoId: photo.id },
-                        e.clientX,
-                        e.clientY
-                      );
-                    }}
-                    onTouchStart={(e) =>
-                      ctxMenu.handleTouchStart(e, {
-                        type: "photo",
-                        sectionId: section.id,
-                        photoId: photo.id,
-                      })
-                    }
-                    onTouchMove={ctxMenu.handleTouchMove}
-                    onTouchEnd={ctxMenu.handleTouchEnd}
-                  >
-                    <PhotoBlob photoId={photo.id} />
-                  </div>
-                ))}
-              </SectionComponent>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="relative">
+      <SetViewer
+        set={set}
+        title={
+          <input
+            type="text"
+            value={set.title}
+            onChange={handleTitleChange}
+            placeholder="Untitled Set"
+            className="w-full text-3xl font-heading bg-transparent border-b border-border focus:outline-none focus:border-primary pb-2"
+            aria-label="Set title"
+          />
+        }
+        onContextMenuSection={(_sectionId, e) =>
+          ctxMenu.handleContextMenu(e, { type: "section", sectionId: _sectionId })
+        }
+        onTouchStartSection={(_sectionId, e) =>
+          ctxMenu.handleTouchStart(e, { type: "section", sectionId: _sectionId })
+        }
+        onTouchMove={ctxMenu.handleTouchMove}
+        onTouchEnd={ctxMenu.handleTouchEnd}
+        onContextMenuPhoto={(_sectionId, photoId, e) => {
+          ctxMenu.open(
+            { type: "photo", sectionId: _sectionId, photoId },
+            e.clientX,
+            e.clientY
+          );
+        }}
+        onTouchStartPhoto={(_sectionId, photoId, e) =>
+          ctxMenu.handleTouchStart(e, {
+            type: "photo",
+            sectionId: _sectionId,
+            photoId,
+          })
+        }
+      />
 
       <input
         ref={fileInputRef}

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useProfile } from "@/lib/profile-store";
+import { usePhotoResolver } from "@/lib/photo-resolver";
 
 export function PhotoBlob({ photoId, className, imgClassName, alt }: { photoId: string; className?: string; imgClassName?: string; alt?: string }) {
-  const { adapter } = useProfile();
+  const resolve = usePhotoResolver();
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export function PhotoBlob({ photoId, className, imgClassName, alt }: { photoId: 
 
     async function load() {
       try {
-        objectUrl = await adapter.getBlobURL(`photo:${photoId}`);
+        objectUrl = await resolve(photoId);
         if (!cancelled) {
           setSrc(objectUrl);
         } else if (objectUrl) {
@@ -33,7 +33,7 @@ export function PhotoBlob({ photoId, className, imgClassName, alt }: { photoId: 
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [photoId, adapter]);
+  }, [photoId, resolve]);
 
   if (!src) {
     return (

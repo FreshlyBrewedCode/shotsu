@@ -5,14 +5,14 @@ import { Set } from "@/lib/types";
 import { PhotoBlob } from "@/components/photo-blob";
 import { Image as ImageIcon } from "@phosphor-icons/react";
 
-export function SetCard({ set }: { set: Set }) {
+export function SetCard({ set, editHref }: { set: Set; editHref?: string }) {
   const firstPhotoId = set.sections.flatMap((s) => s.photos.map((p) => p.id))[0];
   const effectiveCoverId = set.coverPhotoId ?? firstPhotoId ?? null;
   const isEmpty = !effectiveCoverId;
 
   return (
     <Link
-      href={`/sets/${set.id}/edit`}
+      href={editHref ?? `/sets/${set.id}`}
       className="block shrink-0 max-w-[80vw] md:max-w-sm"
     >
       <div className="h-64 md:h-80 rounded-lg overflow-hidden flex items-center justify-center">
