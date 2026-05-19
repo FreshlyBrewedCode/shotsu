@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { PhotoResolver } from "@/lib/photo-resolver";
 import { PublishedResolver } from "@/lib/published-resolver";
 import { PublishedSource } from "@/lib/published-source";
-import { ProfileHeader } from "@/components/profile-header";
-import { ContentSection } from "@/components/content-section";
-import { SetCard } from "@/components/set-card";
+import { SetViewer } from "@/components/set-viewer";
 import { Profile, Set as SetType, CatalogEntry } from "@/lib/types";
 import { ProfileContext, ProfileContextValue } from "@/lib/profile-store";
 
@@ -20,21 +18,23 @@ function getBaseUrl(url: string): string {
   return parsed.toString();
 }
 
-type ViewState =
+type ViewSetState =
   | { status: "loading" }
   | { status: "error"; message: string }
   | {
       status: "ready";
       profile: Profile;
-      sets: Record<string, SetType>;
+      set: SetType;
       resolver: PublishedResolver;
     };
 
-function ViewPageInner() {
+function ViewSetPageInner() {
+  const params = useParams();
   const searchParams = useSearchParams();
   const url = searchParams.get("url");
+  const id = params.id as string;
 
-  const [state, setState] = useState<ViewState>(
+  const [state, setState] = useState<ViewSetState>(
     !url ? { status: "error", message: "Missing ?url= parameter" } : { status: "loading" }
   );
 
@@ -58,11 +58,18 @@ function ViewPageInner() {
           return;
         }
         const sets = source.getSets();
+        const set = sets[id];
+        if (!set) {
+          if (!cancelled) {
+            setState({ status: "error", message: "Set not found" });
+          }
+          return;
+        }
         if (!cancelled) {
           setState({
             status: "ready",
             profile,
-            sets,
+            set,
             resolver: new PublishedResolver(baseUrl),
           });
         }
@@ -80,7 +87,7 @@ function ViewPageInner() {
     return () => {
       cancelled = true;
     };
-  }, [url]);
+  }, [url, id]);
 
   if (state.status === "error") {
     return (
@@ -98,14 +105,13 @@ function ViewPageInner() {
     );
   }
 
-  const { profile, sets, resolver } = state;
-  const setList = profile.sets.map((s) => sets[s.id]).filter(Boolean);
+  const { profile, set, resolver } = state;
 
-  // Provide a minimal read-only ProfileContext so ProfileHeader can render
+  // Provide a minimal read-only ProfileContext so child components can render
   const profileCtxValue: ProfileContextValue = {
     state: {
       profile,
-      sets,
+      sets: { [set.id]: set },
       catalog: [] as CatalogEntry[],
       initialized: true,
     },
@@ -117,30 +123,14 @@ function ViewPageInner() {
     <ProfileContext.Provider value={profileCtxValue}>
       <PhotoResolver.Provider value={resolver}>
         <div className="w-full min-h-screen">
-          <ProfileHeader />
-
-          <ContentSection title="Sets">
-            {setList.length === 0 ? (
-              <div className="flex flex-col items-center justify-center w-full py-12 text-muted-foreground">
-                <p className="text-sm">No sets yet.</p>
-              </div>
-            ) : (
-              setList.map((set) => (
-                <SetCard
-                  key={set.id}
-                  set={set}
-                  viewHref={`/view/sets/${set.id}?url=${encodeURIComponent(url!)}`}
-                />
-              ))
-            )}
-          </ContentSection>
+          <SetViewer set={set} />
         </div>
       </PhotoResolver.Provider>
     </ProfileContext.Provider>
   );
 }
 
-export default function ViewPage() {
+export default function ViewSetPage() {
   return (
     <Suspense
       fallback={
@@ -149,7 +139,7 @@ export default function ViewPage() {
         </div>
       }
     >
-      <ViewPageInner />
+      <ViewSetPageInner />
     </Suspense>
   );
 }

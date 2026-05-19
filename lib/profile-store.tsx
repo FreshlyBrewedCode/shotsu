@@ -207,7 +207,7 @@ export function getDefaultState(): ProfileState {
   };
 }
 
-type ProfileContextValue = {
+export type ProfileContextValue = {
   state: ProfileState;
   dispatch: React.Dispatch<ProfileAction>;
   adapter: StorageAdapter;
