@@ -78,6 +78,19 @@ export function createSet(): Set {
   };
 }
 
+export type PublishTarget = {
+  id: string;
+  publisherId: string;
+  isRegistered: boolean;
+  manifest?: PublishManifest;
+};
+
+export type PublishManifest = {
+  generation: number;
+  publishedAt: string;
+  files: { path: string; hash: string; size: number }[];
+};
+
 export function createProfile(): Profile {
   return {
     id: generateId(),

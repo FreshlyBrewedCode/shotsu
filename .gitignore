@@ -49,3 +49,5 @@ public/photos/**
 # test outputs
 /test-results/
 /playwright-report/
+
+certificates

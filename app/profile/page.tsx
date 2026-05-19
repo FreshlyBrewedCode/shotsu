@@ -8,6 +8,7 @@ import { ContentSection } from "@/components/content-section";
 import { SetCard } from "@/components/set-card";
 import { createSet } from "@/lib/types";
 import { Plus } from "@phosphor-icons/react";
+import { PublishButton } from "@/components/publish-button";
 
 export default function ProfilePage() {
   const { state, dispatch } = useProfile();
@@ -30,7 +31,8 @@ export default function ProfilePage() {
     <div className="w-full min-h-screen">
       <ProfileHeader />
 
-      <div className="px-4 pb-6 max-w-6xl mx-auto flex justify-end">
+      <div className="px-4 pb-6 max-w-6xl mx-auto flex justify-end gap-2">
+        <PublishButton />
         <button
           onClick={handleCreateSet}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium"

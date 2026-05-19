@@ -3,13 +3,14 @@ import { profileReducer, getDefaultState } from "./profile-store";
 import { Profile, Set, Section, CatalogEntry } from "./types";
 
 function makeProfile(overrides?: Partial<Profile>): Profile {
-  return { id: "p-1", name: "", sets: [], ...overrides };
+  return { id: "p-1", name: "", bio: "", avatarPhotoId: null, sets: [], ...overrides };
 }
 
 function makeSet(overrides?: Partial<Set>): Set {
   return {
     id: "s-1",
     title: "",
+    coverPhotoId: null,
     sections: [{ id: "sec-1", layout: "default", photos: [] }],
     ...overrides,
   };
