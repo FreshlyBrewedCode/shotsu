@@ -1,15 +1,11 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { PhotoResolver } from "@/lib/photo-resolver";
-import { PublishedResolver } from "@/lib/published-resolver";
+import { useEffect, useState, ReactNode, useMemo } from "react";
 import { PublishedSource } from "@/lib/published-source";
-import { ProfileHeader } from "@/components/profile-header";
-import { ContentSection } from "@/components/content-section";
-import { SetCard } from "@/components/set-card";
+import { PublishedResolver } from "@/lib/published-resolver";
 import { Profile, Set as SetType, CatalogEntry } from "@/lib/types";
 import { ProfileContext, ProfileContextValue } from "@/lib/profile-store";
+import { PhotoResolver } from "@/lib/photo-resolver";
 
 function getBaseUrl(url: string): string {
   const parsed = new URL(url);
@@ -20,7 +16,7 @@ function getBaseUrl(url: string): string {
   return parsed.toString();
 }
 
-type ViewState =
+type PublishedProfileState =
   | { status: "loading" }
   | { status: "error"; message: string }
   | {
@@ -30,25 +26,25 @@ type ViewState =
       resolver: PublishedResolver;
     };
 
-function ViewPageInner() {
-  const searchParams = useSearchParams();
-  const url = searchParams.get("url");
+export function PublishedProfileProvider({
+  baseUrl,
+  children,
+}: {
+  baseUrl: string;
+  children: ReactNode;
+}) {
+  const [state, setState] = useState<PublishedProfileState>({
+    status: "loading",
+  });
 
-  const [state, setState] = useState<ViewState>(
-    !url ? { status: "error", message: "Missing ?url= parameter" } : { status: "loading" }
-  );
+  const normalizedBaseUrl = useMemo(() => getBaseUrl(baseUrl), [baseUrl]);
 
   useEffect(() => {
-    if (!url) {
-      return;
-    }
-
     let cancelled = false;
 
     async function load() {
       try {
-        const baseUrl = getBaseUrl(url!);
-        const source = new PublishedSource(baseUrl);
+        const source = new PublishedSource(normalizedBaseUrl);
         await source.load();
         const profile = source.getProfile();
         if (!profile) {
@@ -63,14 +59,17 @@ function ViewPageInner() {
             status: "ready",
             profile,
             sets,
-            resolver: new PublishedResolver(baseUrl),
+            resolver: new PublishedResolver(normalizedBaseUrl),
           });
         }
       } catch (err) {
         if (!cancelled) {
           setState({
             status: "error",
-            message: err instanceof Error ? err.message : "Failed to load published profile",
+            message:
+              err instanceof Error
+                ? err.message
+                : "Failed to load published profile",
           });
         }
       }
@@ -80,7 +79,7 @@ function ViewPageInner() {
     return () => {
       cancelled = true;
     };
-  }, [url]);
+  }, [normalizedBaseUrl]);
 
   if (state.status === "error") {
     return (
@@ -99,9 +98,7 @@ function ViewPageInner() {
   }
 
   const { profile, sets, resolver } = state;
-  const setList = profile.sets.map((s) => sets[s.id]).filter(Boolean);
 
-  // Provide a minimal read-only ProfileContext so ProfileHeader can render
   const profileCtxValue: ProfileContextValue = {
     state: {
       profile,
@@ -109,47 +106,15 @@ function ViewPageInner() {
       catalog: [] as CatalogEntry[],
       initialized: true,
     },
-    dispatch: undefined as unknown as ProfileContextValue["dispatch"],
-    adapter: undefined as unknown as ProfileContextValue["adapter"],
+    dispatch: undefined,
+    adapter: undefined,
   };
 
   return (
     <ProfileContext.Provider value={profileCtxValue}>
       <PhotoResolver.Provider value={resolver}>
-        <div className="w-full min-h-screen">
-          <ProfileHeader />
-
-          <ContentSection title="Sets">
-            {setList.length === 0 ? (
-              <div className="flex flex-col items-center justify-center w-full py-12 text-muted-foreground">
-                <p className="text-sm">No sets yet.</p>
-              </div>
-            ) : (
-              setList.map((set) => (
-                <SetCard
-                  key={set.id}
-                  set={set}
-                  viewHref={`/view/sets/${set.id}?url=${encodeURIComponent(url!)}`}
-                />
-              ))
-            )}
-          </ContentSection>
-        </div>
+        {children}
       </PhotoResolver.Provider>
     </ProfileContext.Provider>
-  );
-}
-
-export default function ViewPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <p className="text-muted-foreground">Loading…</p>
-        </div>
-      }
-    >
-      <ViewPageInner />
-    </Suspense>
   );
 }

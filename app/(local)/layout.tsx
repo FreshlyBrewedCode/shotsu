@@ -3,8 +3,8 @@
 import { ProfileProvider } from "@/lib/profile-store";
 import { IndexedDBAdapter } from "@/lib/storage/indexeddb-adapter";
 import { LocalResolver } from "@/lib/photo-resolver";
-import { useMemo, useEffect } from "react";
 import { Nav } from "@/components/nav";
+import { useMemo, useEffect } from "react";
 
 declare global {
   interface Window {
@@ -13,7 +13,11 @@ declare global {
   }
 }
 
-export function ProfileProviderWrapper({ children }: { children: React.ReactNode }) {
+export default function LocalLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const adapter = useMemo(() => new IndexedDBAdapter(), []);
   const resolver = useMemo(() => new LocalResolver(adapter), [adapter]);
 

@@ -12,7 +12,7 @@ export function SetCard({ set, viewHref, editHref }: { set: Set; viewHref?: stri
 
   return (
     <Link
-      href={editHref ?? viewHref ?? `/sets/${set.id}`}
+      href={editHref ?? viewHref ?? `/me/sets/${set.id}`}
       className="block shrink-0 max-w-[80vw] md:max-w-sm"
     >
       <div className="h-64 md:h-80 rounded-lg overflow-hidden flex items-center justify-center">

@@ -1,11 +1,11 @@
 "use client";
 
-import { useProfile } from "@/lib/profile-store";
+import { useLocalProfile } from "@/lib/profile-store";
 import { createSection } from "@/lib/types";
 import { Plus, Layout } from "@phosphor-icons/react";
 
 export function EditToolbar({ setId }: { setId: string }) {
-  const { dispatch } = useProfile();
+  const { dispatch } = useLocalProfile();
 
   function handleAddSection() {
     const section = createSection();

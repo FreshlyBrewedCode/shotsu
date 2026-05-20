@@ -10,6 +10,10 @@ import Link from "next/link";
 
 export function PublishButton() {
   const { state, adapter } = useProfile();
+
+  if (!adapter) {
+    return null;
+  }
   const { profile, sets, initialized } = state;
 
   const [status, setStatus] = useState<

@@ -1,36 +1,34 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useCallback } from "react";
+import Link from "next/link";
 import { useProfile } from "@/lib/profile-store";
 import { SetViewer } from "@/components/set-viewer";
 import { EditToolbar } from "@/components/edit-toolbar";
-import { EditProvider, useEdit } from "@/lib/edit-context";
+import { useEdit } from "@/lib/edit-context";
 import { ingestPhoto } from "@/lib/ingest";
 import {
   useEditContextMenu,
   EditContextMenuOverlay,
 } from "@/components/edit-context-menu";
+import { Pencil } from "@phosphor-icons/react";
+import type { Set } from "@/lib/types";
+import type { StorageAdapter } from "@/lib/storage/adapter";
+import type { ProfileAction } from "@/lib/profile-store";
 
-function SetEditPageInner() {
-  const params = useParams();
-  const router = useRouter();
-  const { state, dispatch, adapter } = useProfile();
-  const { setId, activeSectionId, fileInputRef } = useEdit();
+function SetEditChrome({
+  setId,
+  set,
+  dispatch,
+  adapter,
+}: {
+  setId: string;
+  set: Set;
+  dispatch: React.Dispatch<ProfileAction>;
+  adapter: StorageAdapter;
+}) {
+  const { activeSectionId, fileInputRef } = useEdit();
   const ctxMenu = useEditContextMenu();
-
-  const id = params.id as string;
-  const set = state.sets[id];
-
-  useEffect(() => {
-    if (state.initialized && !set) {
-      router.replace("/");
-    }
-  }, [state.initialized, set, router]);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +38,11 @@ function SetEditPageInner() {
 
       for (const file of Array.from(files)) {
         try {
-          const photoId = await ingestPhoto(file, { setId, sectionId: activeSectionId }, adapter);
+          const photoId = await ingestPhoto(
+            file,
+            { setId, sectionId: activeSectionId },
+            adapter
+          );
           dispatch({
             type: "ADD_PHOTO",
             setId,
@@ -57,20 +59,12 @@ function SetEditPageInner() {
     [activeSectionId, adapter, dispatch, setId]
   );
 
-  if (!state.initialized || !set) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-muted-foreground">Loading…</p>
-      </div>
-    );
-  }
-
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    dispatch({ type: "UPDATE_SET_TITLE", setId: id, title: e.target.value });
+    dispatch({ type: "UPDATE_SET_TITLE", setId, title: e.target.value });
   }
 
   return (
-    <div className="relative">
+    <>
       <SetViewer
         set={set}
         title={
@@ -84,10 +78,16 @@ function SetEditPageInner() {
           />
         }
         onContextMenuSection={(_sectionId, e) =>
-          ctxMenu.handleContextMenu(e, { type: "section", sectionId: _sectionId })
+          ctxMenu.handleContextMenu(e, {
+            type: "section",
+            sectionId: _sectionId,
+          })
         }
         onTouchStartSection={(_sectionId, e) =>
-          ctxMenu.handleTouchStart(e, { type: "section", sectionId: _sectionId })
+          ctxMenu.handleTouchStart(e, {
+            type: "section",
+            sectionId: _sectionId,
+          })
         }
         onTouchMove={ctxMenu.handleTouchMove}
         onTouchEnd={ctxMenu.handleTouchEnd}
@@ -117,26 +117,65 @@ function SetEditPageInner() {
         aria-hidden="true"
       />
 
-      <EditToolbar setId={id} />
+      <EditToolbar setId={setId} />
 
       <EditContextMenuOverlay
         isOpen={ctxMenu.isOpen}
         target={ctxMenu.target}
         position={ctxMenu.position}
         onClose={ctxMenu.close}
-        setId={id}
+        setId={setId}
       />
-    </div>
+    </>
   );
 }
 
-export default function SetEditPage() {
-  const params = useParams();
-  const id = params.id as string;
+export function SetShell({
+  setId,
+  isEditing,
+}: {
+  setId: string;
+  isEditing: boolean;
+}) {
+  const { state, dispatch, adapter } = useProfile();
+  const set = state.sets[setId];
+
+  if (!state.initialized || !set) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <p className="text-muted-foreground">Loading…</p>
+      </div>
+    );
+  }
+
+  const canEdit = dispatch !== undefined && adapter !== undefined;
+
+  if (isEditing && canEdit) {
+    return (
+      <div className="relative">
+        <SetEditChrome
+          setId={setId}
+          set={set}
+          dispatch={dispatch}
+          adapter={adapter}
+        />
+      </div>
+    );
+  }
 
   return (
-    <EditProvider setId={id}>
-      <SetEditPageInner />
-    </EditProvider>
+    <div className="relative">
+      <SetViewer set={set} />
+      {canEdit && (
+        <Link
+          href="?mode=edit"
+          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity"
+          aria-label="Edit set"
+        >
+          <Pencil size={18} weight="bold" />
+          <span className="text-sm font-medium">Edit</span>
+        </Link>
+      )}
+    </div>
   );
 }

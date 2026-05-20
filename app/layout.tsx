@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Inter, Lora } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { ProfileProviderWrapper } from "@/components/profile-provider-wrapper";
 
 const loraHeading = Lora({subsets:['latin'],variable:'--font-heading'});
 
@@ -21,9 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("h-full", "antialiased", "font-sans", inter.variable, loraHeading.variable)}>
       <body className="min-h-full flex flex-col">
-        <ProfileProviderWrapper>
-          {children}
-        </ProfileProviderWrapper>
+        {children}
       </body>
     </html>
   );

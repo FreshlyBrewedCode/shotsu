@@ -11,9 +11,10 @@ export function Nav() {
   const router = useRouter();
 
   function handleCreateSet() {
+    if (!dispatch) return;
     const newSet = createSet();
     dispatch({ type: "CREATE_SET", set: newSet });
-    router.push(`/sets/${newSet.id}/edit`);
+    router.push(`/me/sets/${newSet.id}?mode=edit`);
   }
 
   return (
@@ -27,19 +28,21 @@ export function Nav() {
       </Link>
       <div className="flex items-center gap-1">
         <Link
-          href="/profile"
+          href="/me"
           aria-label="Profile"
           className="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
         >
           <User size={20} weight="bold" />
         </Link>
-        <button
-          onClick={handleCreateSet}
-          aria-label="Create new set"
-          className="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
-        >
-          <Plus size={20} weight="bold" />
-        </button>
+        {dispatch && (
+          <button
+            onClick={handleCreateSet}
+            aria-label="Create new set"
+            className="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
+          >
+            <Plus size={20} weight="bold" />
+          </button>
+        )}
       </div>
     </nav>
   );

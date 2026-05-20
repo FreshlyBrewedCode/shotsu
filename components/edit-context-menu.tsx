@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useProfile } from "@/lib/profile-store";
+import { useLocalProfile } from "@/lib/profile-store";
 import { useEdit } from "@/lib/edit-context";
 
 type ContextMenuTarget =
@@ -103,7 +103,7 @@ export function EditContextMenuOverlay({
   onClose: () => void;
   setId: string;
 }) {
-  const { state, dispatch } = useProfile();
+  const { state, dispatch } = useLocalProfile();
   const { requestAddPhoto } = useEdit();
   const set = state.sets[setId];
   const overlayRef = useRef<HTMLDivElement | null>(null);

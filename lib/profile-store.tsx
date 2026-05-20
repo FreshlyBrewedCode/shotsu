@@ -19,7 +19,7 @@ type ProfileState = {
   initialized: boolean;
 };
 
-type ProfileAction =
+export type ProfileAction =
   | { type: "INIT"; profile: Profile; sets: Record<string, Set>; catalog: CatalogEntry[] }
   | { type: "CREATE_SET"; set: Set }
   | { type: "UPDATE_SET_TITLE"; setId: string; title: string }
@@ -209,8 +209,8 @@ export function getDefaultState(): ProfileState {
 
 export type ProfileContextValue = {
   state: ProfileState;
-  dispatch: React.Dispatch<ProfileAction>;
-  adapter: StorageAdapter;
+  dispatch?: React.Dispatch<ProfileAction>;
+  adapter?: StorageAdapter;
 };
 
 export const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -286,4 +286,18 @@ export function useProfile() {
     throw new Error("useProfile must be used within a ProfileProvider");
   }
   return ctx;
+}
+
+export function useLocalProfile(): Omit<ProfileContextValue, "dispatch" | "adapter"> & {
+  dispatch: React.Dispatch<ProfileAction>;
+  adapter: StorageAdapter;
+} {
+  const ctx = useProfile();
+  if (!ctx.dispatch || !ctx.adapter) {
+    throw new Error("useLocalProfile must be used within a local ProfileProvider");
+  }
+  return ctx as Omit<ProfileContextValue, "dispatch" | "adapter"> & {
+    dispatch: React.Dispatch<ProfileAction>;
+    adapter: StorageAdapter;
+  };
 }

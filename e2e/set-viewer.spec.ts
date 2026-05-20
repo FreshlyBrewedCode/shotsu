@@ -44,7 +44,7 @@ test.describe("Set viewer", () => {
     });
 
     // Navigate to the viewer
-    await page.goto("/sets/test-set-1");
+    await page.goto("/me/sets/test-set-1");
     await page.waitForLoadState("networkidle");
 
     // Verify title is visible
