@@ -214,3 +214,19 @@ The system SHALL provide a dispatch action to remove a PhotoRef from a Section b
 #### Scenario: Removing a photo from a section
 - **WHEN** the `REMOVE_PHOTO` action is dispatched with a set id, section id, and photo id
 - **THEN** the PhotoRef SHALL no longer appear in the section's photos array and the set SHALL be persisted
+
+## ADDED Requirements
+
+### Requirement: Publish target storage
+The system SHALL store `PublishTarget` records in IndexedDB to track configured publishing targets, their manifests, and which target is registered as the canonical public profile.
+
+#### Scenario: Publish target persisted
+- **WHEN** a user configures a publishing target and publishes
+- **THEN** the target config and latest manifest SHALL be stored in IndexedDB under a `publish-targets` document
+
+### Requirement: Only one registered target
+The system SHALL enforce that at most one `PublishTarget` has `isRegistered: true` at any time. Setting a target as registered SHALL unset any previously registered target.
+
+#### Scenario: Registering a new target unregisters the old
+- **WHEN** a user registers target B while target A is already registered
+- **THEN** target A SHALL have `isRegistered: false` and target B SHALL have `isRegistered: true`

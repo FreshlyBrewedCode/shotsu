@@ -20,3 +20,12 @@ The `ProfileProvider` SHALL wrap its children with `PhotoResolver.Provider` usin
 #### Scenario: Child components access the resolver
 - **WHEN** a component renders inside `ProfileProvider`
 - **THEN** it SHALL be able to call `usePhotoResolver()` successfully
+
+## ADDED Requirements
+
+### Requirement: PublishedResolver implementation
+The system SHALL provide a `PublishedResolver` that implements photo resolution for published static files. It SHALL resolve `photoId` to `${baseUrl}/photos/{photoId}.webp`.
+
+#### Scenario: PublishedResolver returns an HTTP URL
+- **WHEN** `PublishedResolver.resolve("abc-123")` is called with base URL `https://cdn.example.com/`
+- **THEN** it SHALL return `https://cdn.example.com/photos/abc-123.webp`
