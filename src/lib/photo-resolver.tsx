@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useCallback } from "react";
 import { StorageAdapter } from "./storage/adapter";
 
 export type ResolveFn = (photoId: string) => Promise<string>;
@@ -28,5 +28,5 @@ export function usePhotoResolver(): ResolveFn {
   if (!ctx) {
     throw new Error("usePhotoResolver must be used within a PhotoResolver.Provider");
   }
-  return (photoId: string) => ctx.resolve(photoId);
+  return useCallback((photoId: string) => ctx.resolve(photoId), [ctx]);
 }
