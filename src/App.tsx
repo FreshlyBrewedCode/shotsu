@@ -8,6 +8,7 @@ import { PublishedProfilePage } from "./pages/PublishedProfilePage";
 import { PublishedSetPage } from "./pages/PublishedSetPage";
 import { ViewPage } from "./pages/ViewPage";
 import { ViewSetPage } from "./pages/ViewSetPage";
+import { ViewSetsPage } from "./pages/ViewSetsPage";
 import { LocalLayout } from "./local/LocalLayout";
 
 export function App() {
@@ -24,6 +25,7 @@ export function App() {
           <Route path="/p/:username" element={<PublishedProfilePage />} />
           <Route path="/p/:username/sets/:id" element={<PublishedSetPage />} />
           <Route path="/view" element={<ViewPage />} />
+          <Route path="/view/sets" element={<ViewSetsPage />} />
           <Route path="/view/sets/:id" element={<ViewSetPage />} />
         </Routes>
       </RootLayout>

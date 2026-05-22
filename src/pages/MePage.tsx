@@ -19,6 +19,7 @@ export function MePage() {
   return (
     <ProfileShell
       makeSetHref={(id) => `/me/sets/${id}`}
+      setsListHref="/sets"
       actions={
         <>
           <PublishButton />

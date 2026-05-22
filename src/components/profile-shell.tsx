@@ -7,9 +7,11 @@ import { ReactNode } from "react";
 
 export function ProfileShell({
   makeSetHref,
+  setsListHref,
   actions,
 }: {
   makeSetHref: (id: string) => string;
+  setsListHref?: string;
   actions?: ReactNode;
 }) {
   const { state } = useProfile();
@@ -34,12 +36,14 @@ export function ProfileShell({
       <ContentSection
         title="Sets"
         action={
-        <Link
-          to="/sets"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-            Show all
-          </Link>
+          setsListHref ? (
+            <Link
+              to={setsListHref}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Show all
+            </Link>
+          ) : undefined
         }
       >
         {previewSets.length === 0 ? (

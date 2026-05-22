@@ -34,6 +34,7 @@ function ViewPageInner() {
           makeSetHref={(id) =>
             `/view/sets/${id}?url=${encodeURIComponent(url)}`
           }
+          setsListHref={`/view/sets?url=${encodeURIComponent(url)}`}
         />
       </main>
     </PublishedProfileProvider>
