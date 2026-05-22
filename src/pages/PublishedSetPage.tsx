@@ -3,6 +3,7 @@ import { resolveUsername } from "@/lib/registry";
 import { PublishedProfileProvider } from "@/lib/published-profile-provider";
 import { SetShell } from "@/components/set-shell";
 import { Nav } from "@/components/nav";
+import { EditProvider } from "@/lib/edit-context";
 
 export function PublishedSetPage() {
   const params = useParams();
@@ -22,7 +23,9 @@ export function PublishedSetPage() {
     <PublishedProfileProvider baseUrl={baseUrl}>
       <Nav />
       <main className="pt-14">
-        <SetShell setId={id} isEditing={false} />
+        <EditProvider setId={id}>
+          <SetShell setId={id} isEditing={false} />
+        </EditProvider>
       </main>
     </PublishedProfileProvider>
   );

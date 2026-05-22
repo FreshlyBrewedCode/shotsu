@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { PublishedProfileProvider } from "@/lib/published-profile-provider";
 import { SetShell } from "@/components/set-shell";
 import { Nav } from "@/components/nav";
+import { EditProvider } from "@/lib/edit-context";
 
 function getBaseUrl(url: string): string {
   const parsed = new URL(url);
@@ -32,7 +33,9 @@ function ViewSetPageInner() {
     <PublishedProfileProvider baseUrl={baseUrl}>
       <Nav />
       <main className="pt-14">
-        <SetShell setId={id} isEditing={false} />
+        <EditProvider setId={id}>
+          <SetShell setId={id} isEditing={false} />
+        </EditProvider>
       </main>
     </PublishedProfileProvider>
   );
