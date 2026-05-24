@@ -162,7 +162,7 @@ describe("profileReducer", () => {
     expect(after.sets["s-1"].sections[0].layout).toBe("columns");
   });
 
-  it("ADD_PHOTO appends a photo ref to the correct section", () => {
+  it("ADD_PHOTO appends a photo ref to the correct section and catalog", () => {
     const set = makeSet({
       id: "s-1",
       sections: [
@@ -171,12 +171,23 @@ describe("profileReducer", () => {
       ],
     });
     const before = makeState({ sets: { "s-1": set } });
+    const entry: CatalogEntry = {
+      id: "ph-1",
+      filename: "test.jpg",
+      mimeType: "image/webp",
+      width: 100,
+      height: 100,
+      exif: {},
+      addedAt: "2024-01-01T00:00:00.000Z",
+    };
 
-    const after = profileReducer(before, { type: "ADD_PHOTO", setId: "s-1", sectionId: "sec-2", photoId: "ph-1" });
+    const after = profileReducer(before, { type: "ADD_PHOTO", setId: "s-1", sectionId: "sec-2", photoId: "ph-1", entry });
 
     expect(after.sets["s-1"].sections[0].photos).toHaveLength(0);
     expect(after.sets["s-1"].sections[1].photos).toHaveLength(1);
     expect(after.sets["s-1"].sections[1].photos[0]).toEqual({ id: "ph-1" });
+    expect(after.catalog).toHaveLength(1);
+    expect(after.catalog[0]).toEqual(entry);
   });
 
   it("REMOVE_PHOTO removes the photo ref from the section", () => {
@@ -199,7 +210,7 @@ describe("profileReducer", () => {
     expect(profileReducer(before, { type: "REMOVE_SECTION", setId: "x", sectionId: "y" })).toEqual(before);
     expect(profileReducer(before, { type: "MOVE_SECTION", setId: "x", sectionId: "y", direction: "up" })).toEqual(before);
     expect(profileReducer(before, { type: "UPDATE_SECTION_LAYOUT", setId: "x", sectionId: "y", layout: "columns" })).toEqual(before);
-    expect(profileReducer(before, { type: "ADD_PHOTO", setId: "x", sectionId: "y", photoId: "z" })).toEqual(before);
+    expect(profileReducer(before, { type: "ADD_PHOTO", setId: "x", sectionId: "y", photoId: "z", entry: { id: "z", filename: "", mimeType: "", width: 0, height: 0, exif: {}, addedAt: "" } })).toEqual(before);
     expect(profileReducer(before, { type: "REMOVE_PHOTO", setId: "x", sectionId: "y", photoId: "z" })).toEqual(before);
   });
 });

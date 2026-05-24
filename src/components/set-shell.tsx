@@ -44,7 +44,7 @@ export function SetShell({
 
       for (const file of Array.from(files)) {
         try {
-          const photoId = await ingestPhoto(
+          const { photoId, entry } = await ingestPhoto(
             file,
             { setId, sectionId: activeSectionId },
             adapter
@@ -54,6 +54,7 @@ export function SetShell({
             setId,
             sectionId: activeSectionId,
             photoId,
+            entry,
           });
         } catch (err) {
           console.error("Failed to ingest photo:", err);

@@ -11,7 +11,7 @@ export async function ingestPhoto(
   file: File,
   _target: IngestTarget,
   adapter: StorageAdapter
-): Promise<string> {
+): Promise<{ photoId: string; entry: CatalogEntry }> {
   const id = generateId();
 
   // 1. Extract EXIF
@@ -57,9 +57,6 @@ export async function ingestPhoto(
   // 4. Store blob
   await adapter.putBlob(`photo:${id}`, blob);
 
-  // 5. Update catalog index
-  const catalogDoc = await adapter.getDoc<CatalogEntry[]>("catalog-index");
-  const catalog: CatalogEntry[] = catalogDoc ?? [];
   const entry: CatalogEntry = {
     id,
     filename: file.name,
@@ -69,10 +66,8 @@ export async function ingestPhoto(
     exif,
     addedAt: new Date().toISOString(),
   };
-  catalog.push(entry);
-  await adapter.setDoc("catalog-index", catalog);
 
-  return id;
+  return { photoId: id, entry };
 }
 
 function mapExif(data: Record<string, unknown>): ExifData {

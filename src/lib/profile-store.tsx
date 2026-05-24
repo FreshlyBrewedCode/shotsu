@@ -27,7 +27,7 @@ export type ProfileAction =
   | { type: "REMOVE_SECTION"; setId: string; sectionId: string }
   | { type: "MOVE_SECTION"; setId: string; sectionId: string; direction: "up" | "down" }
   | { type: "UPDATE_SECTION_LAYOUT"; setId: string; sectionId: string; layout: "default" | "columns" }
-  | { type: "ADD_PHOTO"; setId: string; sectionId: string; photoId: string }
+  | { type: "ADD_PHOTO"; setId: string; sectionId: string; photoId: string; entry: CatalogEntry }
   | { type: "REMOVE_PHOTO"; setId: string; sectionId: string; photoId: string }
   | { type: "UPDATE_PROFILE_NAME"; name: string }
   | { type: "UPDATE_PROFILE_BIO"; bio: string }
@@ -132,7 +132,7 @@ export function profileReducer(state: ProfileState, action: ProfileAction): Prof
       };
     }
     case "ADD_PHOTO": {
-      const { setId, sectionId, photoId } = action;
+      const { setId, sectionId, photoId, entry } = action;
       const existing = state.sets[setId];
       if (!existing) return state;
       const updatedSet: Set = {
@@ -146,6 +146,7 @@ export function profileReducer(state: ProfileState, action: ProfileAction): Prof
       return {
         ...state,
         sets: { ...state.sets, [setId]: updatedSet },
+        catalog: [...state.catalog, entry],
       };
     }
     case "REMOVE_PHOTO": {
