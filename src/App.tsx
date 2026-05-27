@@ -10,10 +10,12 @@ import { ViewPage } from "./pages/ViewPage";
 import { ViewSetPage } from "./pages/ViewSetPage";
 import { ViewSetsPage } from "./pages/ViewSetsPage";
 import { LocalLayout } from "./local/LocalLayout";
+import { ScrollToTop } from "./components/scroll-to-top";
 
 export function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <RootLayout>
         <Routes>
           <Route path="/" element={<HomePage />} />
