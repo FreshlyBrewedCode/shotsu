@@ -81,6 +81,8 @@ export function createSet(): Set {
 export type PublishTarget = {
   id: string;
   publisherId: string;
+  name: string;
+  config: Record<string, unknown>;
   isRegistered: boolean;
   manifest?: PublishManifest;
 };

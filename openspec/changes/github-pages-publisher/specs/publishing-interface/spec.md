@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Publisher interface
 The system SHALL define a `Publisher` interface with `id`, `name`, `capabilities` (`{ incremental: boolean }`), `configure()`, optional `getManifest()`, and `publish()`.
@@ -41,20 +41,6 @@ The orchestrator SHALL maintain a `PublishManifest` per publish target in local 
 - **WHEN** two targets of the same publisher type exist
 - **THEN** each target SHALL maintain its own independent manifest
 
-### Requirement: Manifest published with bundle
-The exporter SHALL inject `shotsu-manifest.json` into the `FileBundle` containing the current `PublishManifest`.
-
-#### Scenario: Bundle contains manifest file
-- **WHEN** the exporter produces a `FileBundle`
-- **THEN** it SHALL contain a file at path `shotsu-manifest.json` with the manifest JSON as its content
-
-### Requirement: Publisher getManifest for state recovery
-Publishers that expose remote file access SHALL implement `getManifest()` to fetch the currently published `shotsu-manifest.json` from the remote destination.
-
-#### Scenario: Cross-client publish recovery
-- **WHEN** a client has no local manifest for a target but the publisher implements `getManifest()`
-- **THEN** the orchestrator SHALL call `getManifest()` and use the returned manifest as the basis for computing diffs
-
 ### Requirement: ZIP publisher implementation
 The system SHALL provide a `ZipPublisher` that receives a `{ mode: 'full', files: [...] }` instruction and generates a downloadable ZIP archive containing all files.
 
@@ -65,17 +51,3 @@ The system SHALL provide a `ZipPublisher` that receives a `{ mode: 'full', files
 #### Scenario: ZIP publisher ignores configuration
 - **WHEN** `configure()` is called on `ZipPublisher` with any config
 - **THEN** it SHALL resolve successfully as a no-op
-
-### Requirement: Concurrent publish detection
-The orchestrator SHALL compare the remote manifest's `generation` with the locally expected generation before publishing. If `remote.generation > localExpected`, it SHALL warn the user that another device published more recently.
-
-#### Scenario: Another device published first
-- **WHEN** `publisher.getManifest()` returns a manifest with generation 5, but the local expected generation is 3
-- **THEN** the orchestrator SHALL surface a warning before proceeding with the publish
-
-### Requirement: Publish progress reporting
-The orchestrator SHALL support an `onProgress` callback that receives events during publishing: `uploading`, `deleting`, `completed`, and `error`.
-
-#### Scenario: Upload progress reported
-- **WHEN** a publisher uploads files
-- **THEN** `onProgress` SHALL be called with `{ type: 'uploading', file, current, total }` for each file

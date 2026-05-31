@@ -41,7 +41,7 @@ export interface Publisher {
   id: string;
   name: string;
   capabilities: PublisherCapabilities;
-  configure(): Promise<void>;
+  configure(config: Record<string, unknown>): Promise<void>;
   getManifest?(): Promise<PublishManifest | null>;
   publish(
     instruction: PublishInstruction,

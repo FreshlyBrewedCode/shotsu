@@ -15,6 +15,7 @@ const PUBLISH_TARGETS_KEY = "publish-targets";
 export class PublishOrchestrator {
   constructor(
     private adapter: StorageAdapter,
+    private targetId: string,
     private publisher: Publisher
   ) {}
 
@@ -27,7 +28,7 @@ export class PublishOrchestrator {
   }
 
   private findTarget(targets: PublishTarget[]): PublishTarget | undefined {
-    return targets.find((t) => t.publisherId === this.publisher.id);
+    return targets.find((t) => t.id === this.targetId);
   }
 
   private async getLocalManifest(): Promise<PublishManifest | null> {
@@ -38,13 +39,15 @@ export class PublishOrchestrator {
 
   private async saveManifest(manifest: PublishManifest): Promise<void> {
     const targets = await this.loadTargets();
-    const idx = targets.findIndex((t) => t.publisherId === this.publisher.id);
+    const idx = targets.findIndex((t) => t.id === this.targetId);
     if (idx >= 0) {
       targets[idx] = { ...targets[idx], manifest };
     } else {
       targets.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : `target-${Date.now()}`,
+        id: this.targetId,
         publisherId: this.publisher.id,
+        name: this.publisher.name,
+        config: {},
         isRegistered: false,
         manifest,
       });

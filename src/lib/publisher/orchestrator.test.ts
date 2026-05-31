@@ -77,7 +77,7 @@ describe("PublishOrchestrator", () => {
   beforeEach(() => {
     adapter = new MockAdapter();
     publisher = makePublisher();
-    orchestrator = new PublishOrchestrator(adapter, publisher);
+    orchestrator = new PublishOrchestrator(adapter, "target-1", publisher);
   });
 
   it("saves manifest to IndexedDB after publish", async () => {
@@ -104,7 +104,7 @@ describe("PublishOrchestrator", () => {
     publisher = makePublisher({
       getManifest: vi.fn().mockResolvedValue(remoteManifest),
     });
-    orchestrator = new PublishOrchestrator(adapter, publisher);
+    orchestrator = new PublishOrchestrator(adapter, "target-1", publisher);
 
     const profile = makeProfile();
     const result = await orchestrator.publish(profile, {});
@@ -116,7 +116,7 @@ describe("PublishOrchestrator", () => {
 
   it("produces full instruction for non-incremental publisher", async () => {
     publisher = makePublisher({ capabilities: { incremental: false } });
-    orchestrator = new PublishOrchestrator(adapter, publisher);
+    orchestrator = new PublishOrchestrator(adapter, "target-1", publisher);
 
     const profile = makeProfile();
     await orchestrator.publish(profile, {});
@@ -129,7 +129,7 @@ describe("PublishOrchestrator", () => {
     publisher = makePublisher({
       capabilities: { incremental: true },
     });
-    orchestrator = new PublishOrchestrator(adapter, publisher);
+    orchestrator = new PublishOrchestrator(adapter, "target-1", publisher);
 
     const profile = makeProfile();
     await orchestrator.publish(profile, {});
@@ -145,7 +145,7 @@ describe("PublishOrchestrator", () => {
     publisher = makePublisher({
       capabilities: { incremental: true },
     });
-    orchestrator = new PublishOrchestrator(adapter, publisher);
+    orchestrator = new PublishOrchestrator(adapter, "t1", publisher);
 
     // Seed local manifest with one file
     const oldManifest = makeManifest({
@@ -156,7 +156,7 @@ describe("PublishOrchestrator", () => {
       ],
     });
     await adapter.setDoc("publish-targets", [
-      { id: "t1", publisherId: "zip", isRegistered: false, manifest: oldManifest },
+      { id: "t1", publisherId: "zip", name: "", config: {}, isRegistered: false, manifest: oldManifest },
     ]);
 
     // Mock the publisher to return our desired result for getManifest
@@ -164,7 +164,7 @@ describe("PublishOrchestrator", () => {
       capabilities: { incremental: true },
       getManifest: vi.fn().mockResolvedValue(oldManifest),
     });
-    orchestrator = new PublishOrchestrator(adapter, publisher);
+    orchestrator = new PublishOrchestrator(adapter, "t1", publisher);
 
     const profile = makeProfile();
     await orchestrator.publish(profile, {});
@@ -181,13 +181,13 @@ describe("PublishOrchestrator", () => {
   it("warns on concurrent publish detection", async () => {
     const localManifest = makeManifest({ generation: 2 });
     await adapter.setDoc("publish-targets", [
-      { id: "t1", publisherId: "zip", isRegistered: false, manifest: localManifest },
+      { id: "t1", publisherId: "zip", name: "", config: {}, isRegistered: false, manifest: localManifest },
     ]);
 
     publisher = makePublisher({
       getManifest: vi.fn().mockResolvedValue(makeManifest({ generation: 5 })),
     });
-    orchestrator = new PublishOrchestrator(adapter, publisher);
+    orchestrator = new PublishOrchestrator(adapter, "t1", publisher);
 
     const profile = makeProfile();
     const result = await orchestrator.publish(profile, {});
@@ -207,7 +207,7 @@ describe("PublishOrchestrator", () => {
     publisher = makePublisher({
       publish: publishMock,
     });
-    orchestrator = new PublishOrchestrator(adapter, publisher);
+    orchestrator = new PublishOrchestrator(adapter, "target-1", publisher);
 
     const profile = makeProfile();
     const onProgress = () => {

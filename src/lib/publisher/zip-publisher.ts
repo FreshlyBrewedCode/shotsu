@@ -12,7 +12,8 @@ export class ZipPublisher implements Publisher {
   name = "ZIP Download";
   capabilities: PublisherCapabilities = { incremental: false };
 
-  async configure(): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async configure(_config: Record<string, unknown>): Promise<void> {
     // no-op for ZIP publisher
   }
 
